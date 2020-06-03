@@ -59,7 +59,7 @@ print("Connecting to " + host + "/" + topic)
 
 mqttc.connect(host, port=1883, keepalive=60)
 
-mqttc.subscribe(topic, 0)
+mqttc.subscribe(topic, velocity)
 
 # Publish messages from Python
 
@@ -67,7 +67,7 @@ num = 0
 
 while num != 5:
 
-      ret = mqttc.publish(topic, "Message from Python!\n", qos=0, velocity)
+      ret = mqttc.publish(topic, velocity)
 
       if (ret[0] != 0):
 
@@ -75,7 +75,7 @@ while num != 5:
 
       mqttc.loop()
 
-      time.sleep(0.1)
+      time.sleep(1.0)
 
       num += 1
 

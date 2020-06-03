@@ -31,6 +31,10 @@ volatile bool closed = false;
 const char* topic = "Velocity";
 
 
+int first = 1;
+float horizon_z;
+float velocity_z=0;
+
 Thread mqtt_thread(osPriorityHigh);
 
 EventQueue mqtt_queue;
@@ -71,6 +75,43 @@ EventQueue mqtt_queue;
 #define FXOS8700Q_M_CTRL_REG2 0x5C
 
 #define FXOS8700Q_WHOAMI_VAL 0xC7
+I2C i2c( PTD9,PTD8);
+
+int m_addr = FXOS8700CQ_SLAVE_ADDR1;
+
+
+void FXOS8700CQ_readRegs(int addr, uint8_t * data, int len);
+
+void FXOS8700CQ_writeRegs(uint8_t * data, int len);
+
+
+void getAcc(Arguments *in, Reply *out);
+
+void getAddr(Arguments *in, Reply *out);
+
+
+RPCFunction rpcAcc(&getAcc, "getAcc");
+
+RPCFunction rpcAddr(&getAddr, "getAddr");
+
+RawSerial pc(USBTX, USBRX);
+
+RawSerial xbee(D12, D11);
+
+
+
+EventQueue queue(32 * EVENTS_EVENT_SIZE);
+
+Thread t;
+
+void xbee_rx_interrupt(void);
+
+void xbee_rx(void);
+
+void reply_messange(char *xbee_reply, char *messange);
+
+void check_addr(char *xbee_reply, char *messenger);
+
 
 void messageArrived(MQTT::MessageData& md) {
 
@@ -103,7 +144,8 @@ void publish_message(MQTT::Client<MQTTNetwork, Countdown>* client) {
 
       char buff[100];
 
-      sprintf(buff, "QoS0 Hello, Python! #%d", message_num);
+      
+      sprintf(velocity_z);
 
       message.qos = MQTT::QOS0;
 
@@ -115,7 +157,7 @@ void publish_message(MQTT::Client<MQTTNetwork, Countdown>* client) {
 
       message.payloadlen = strlen(buff) + 1;
 
-      int rc = client->publish(topic, message);
+      int rc = client->publish(topic, velocity_z);
 
 
       printf("rc:  %d\r\n", rc);
@@ -132,45 +174,7 @@ void close_mqtt() {
 
 
 
-I2C i2c( PTD9,PTD8);
 
-int m_addr = FXOS8700CQ_SLAVE_ADDR1;
-
-
-void FXOS8700CQ_readRegs(int addr, uint8_t * data, int len);
-
-void FXOS8700CQ_writeRegs(uint8_t * data, int len);
-
-
-void getAcc(Arguments *in, Reply *out);
-
-void getAddr(Arguments *in, Reply *out);
-
-
-RPCFunction rpcAcc(&getAcc, "getAcc");
-
-RPCFunction rpcAddr(&getAddr, "getAddr");
-
-RawSerial pc(USBTX, USBRX);
-
-RawSerial xbee(D12, D11);
-
-
-int first = 1;
-float horizon_z;
-float velocity_z=0;
-
-EventQueue queue(32 * EVENTS_EVENT_SIZE);
-
-Thread t;
-
-void xbee_rx_interrupt(void);
-
-void xbee_rx(void);
-
-void reply_messange(char *xbee_reply, char *messange);
-
-void check_addr(char *xbee_reply, char *messenger);
 
 
 int main(){

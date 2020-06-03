@@ -66,8 +66,9 @@ num = 0
 
 while num != 5:
 
-      ret = mqttc.subscribe(topic, "Message from Python!\n", qos=0, velocity)
-      print()
+      ret = mqttc.subscribe(topic,  velocity)
+      print(ret) 
+      print(velocity)
       if (ret[0] != 0):
 
             print("Publish failed")
